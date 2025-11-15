@@ -1,6 +1,6 @@
 [package]
 name = "paya"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Rogerio Pereira Araujo <rogerio.araujo@gmail.com>"]
 license = "MIT"
 description = "A minimum rest client based on deboa http client for rust"
