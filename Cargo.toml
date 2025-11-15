@@ -1,6 +1,11 @@
 [package]
 name = "paya"
-version = "0.1.1"
+version = "0.1.2"
+authors = ["Rogerio Pereira Araujo <rogerio.araujo@gmail.com>"]
+license = "MIT"
+description = "A minimum rest client based on deboa http client for rust"
+homepage = "https://github.com/ararog/paya"
+repository = "https://github.com/ararog/paya"
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
