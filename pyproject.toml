@@ -5,6 +5,8 @@ build-backend = "maturin"
 [project]
 name = "paya"
 description = "A minimum rest client based on deboa http client for rust"
+license = "MIT"
+readme = "README.md"
 authors = [
     { name = "Rogerio Pereira Araujo", email = "rogerio.araujo@gmail.com" }
 ]
