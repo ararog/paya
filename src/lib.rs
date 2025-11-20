@@ -63,6 +63,14 @@ mod paya {
             slf
         }
 
+        fn set_content_type<'a>(mut slf: PyRefMut<'a, Self>, content_type: &str) -> PyRefMut<'a, Self> {
+            slf.headers.insert(
+                CONTENT_TYPE,
+                HeaderValue::from_str(content_type).unwrap(),
+            );
+            slf
+        }
+
         fn retries<'a>(mut slf: PyRefMut<'a, Self>, retries: u32) -> PyRefMut<'a, Self> {
             slf.retries = retries;
             slf
@@ -108,10 +116,20 @@ mod paya {
     pub struct Massa {
         status_code: u16,
         body: Vec<u8>,
+        headers: HeaderMap,
     }
 
     #[pymethods]
     impl Massa {
+        pub fn headers(&self, key: &str) -> Option<&str> {
+            let header = self.headers.get(key);
+            if let Some(header) = header {
+                Some(header.to_str().unwrap())
+            } else {
+                None
+            }
+        }
+
         pub fn status_code(&self) -> u16 {
             self.status_code
         }
@@ -163,6 +181,7 @@ mod paya {
                 .expect("Could not send request!");
 
             let volta = Massa {
+                headers: response.headers().clone(),
                 status_code: response.status().as_u16(),
                 body: response.raw_body().await,
             };
