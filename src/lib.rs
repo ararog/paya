@@ -3,7 +3,9 @@ use pyo3::prelude::*;
 /// A Python module implemented in Rust.
 #[pymodule]
 mod paya {
-    use deboa::{Deboa, request::DeboaRequest};
+    use std::collections::HashMap;
+
+    use deboa::{Deboa, cookie::DeboaCookie, request::DeboaRequest};
     use http::{
         HeaderMap, HeaderName, HeaderValue, Method,
         header::{CONTENT_TYPE, HOST},
@@ -19,6 +21,7 @@ mod paya {
         token: Option<String>,
         method: Method,
         path: String,
+        cookies: Option<HashMap<String, DeboaCookie>>,
         headers: HeaderMap,
         retries: u32,
         body: Vec<u8>,
@@ -46,8 +49,21 @@ mod paya {
                 path: String::new(),
                 retries: 0,
                 headers,
+                cookies: None,
                 body: Vec::new(),
             }
+        }
+
+        fn cookie<'a>(mut slf: PyRefMut<'a, Self>, key: &str, value: &str) -> PyRefMut<'a, Self> {
+            let cookie = DeboaCookie::new(key, value);
+            if let Some(cookies) = &mut slf.cookies {
+                cookies.insert(key.to_string(), cookie);
+            } else {
+                slf.cookies = Some(
+                  HashMap::from([(key.to_string(), cookie)])
+                );
+            }
+            slf
         }
 
         fn header<'a>(mut slf: PyRefMut<'a, Self>, key: &str, value: &str) -> PyRefMut<'a, Self> {
@@ -163,6 +179,12 @@ mod paya {
             .method(paya.method.clone())
             .headers(paya.headers.clone())
             .raw_body(&paya.body);
+
+        let request = if let Some(cookies) = &paya.cookies {
+            request.cookies(cookies.clone())
+        } else {
+            request
+        };
 
         let request = if let Some(token) = &paya.token {
             request.bearer_auth(token)
